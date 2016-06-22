@@ -2,6 +2,7 @@ package backwardscap.gates.to_morrow;
 
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AlertDialog;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -24,19 +26,39 @@ import backwardscap.gates.to_morrow.db.TaskDbHelper;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private TaskDbHelper mHelper;
+    private TaskDbHelper dbHelper;
     private ListView mTaskListView;
+    private ListView TmrListView;
     private ArrayAdapter<String> mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mHelper = new TaskDbHelper(this);
-        mTaskListView = (ListView) findViewById(R.id.list_todo);
-        //SQLiteDatabase db = mHelper.getReadableDatabase();
 
-        UpdateUI();
+        dbHelper = new TaskDbHelper(this);
+        mTaskListView = (ListView) findViewById(R.id.list_todo);
+
+        mTaskListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int searchID = position + 1;
+
+                Bundle dataBundle = new Bundle();
+
+                dataBundle.putInt("id",searchID);
+
+                Intent intent = new Intent(getApplicationContext(),TaskContract.class);
+
+                intent.putExtras(dataBundle);
+                startActivity(intent);
+
+            }
+        });
+
+                //SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+                UpdateUI();
     }
 
 
@@ -60,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 String task = String.valueOf(taskEditText.getText());
-                                SQLiteDatabase db = mHelper.getWritableDatabase();
+                                SQLiteDatabase db = dbHelper.getWritableDatabase();
                                 ContentValues values = new ContentValues();
                                 values.put(TaskContract.TaskEntry.COL_TASK_TITLE,task);
                                 db.insertWithOnConflict(TaskContract.TaskEntry.TABLE,
@@ -82,15 +104,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void deleteTask(View view){
+    public void editText(View view){
 
+        View parent = (View) view.getParent();
+
+        final TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
+        taskTextView.setSelected(true);
+
+        String task = String.valueOf(taskTextView.getText());
+
+        ArrayList arrayList = dbHelper.getAllTasks();
+
+
+
+        Log.d(TAG,"End");
+    }
+
+    public void deleteTask(View view){
         //Get View Parent
         View parent = (View) view.getParent();
         TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
 
         //Identify task
         String task = String.valueOf(taskTextView.getText());
-        SQLiteDatabase db = mHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         //Delete entry
         db.delete(TaskContract.TaskEntry.TABLE,TaskContract.TaskEntry.COL_TASK_TITLE+" = ?",
@@ -101,19 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void UpdateUI(){
 
-        //Get Task List and associated DB
-        ArrayList<String> taskList = new ArrayList<>();
-        SQLiteDatabase db = mHelper.getReadableDatabase();
-        Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
-                new String[]{TaskContract.TaskEntry._ID,
-                        TaskContract.TaskEntry.COL_TASK_TITLE},
-                null,null,null,null,null);
-
-        //Walk through the array of tasks, adding each to the taskList
-        while(cursor.moveToNext()){
-            int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
-            taskList.add(cursor.getString(idx));
-        }
+        ArrayList taskList = dbHelper.getAllTasks();
 
         //If the ArrayAdapter is not there, create one
         if(mAdapter==null){
@@ -130,8 +155,8 @@ public class MainActivity extends AppCompatActivity {
             mAdapter.notifyDataSetChanged();
 
         }
-        cursor.close();
-        db.close();
+        //cursor.close();
+        //db.close();
     }
 
 }
