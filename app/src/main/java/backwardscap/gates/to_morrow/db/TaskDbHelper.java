@@ -40,10 +40,15 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor c = db.rawQuery("select task from " + TaskContract.TaskEntry.TABLE + " where ID = "+ ID,null);
+        Cursor c = db.rawQuery("select * from tasks",null);
         c.moveToFirst();
+        while(c.moveToNext()) {
+            for (int i = 0; i < c.getColumnCount(); i++) {
+                Log.d("DB:", c.getString(i));
+            }
+            Log.d("End","Cursor Next");
+        }
 
-        Log.d("TAG",c.getString(0));
 
     }
 
