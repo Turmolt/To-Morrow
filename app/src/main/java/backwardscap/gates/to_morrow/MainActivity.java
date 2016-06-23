@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayList arrayList = dbHelper.getAllTasks();
 
 
+        dbHelper.getThisTask(0);
 
         Log.d(TAG,"EndiT");
     }

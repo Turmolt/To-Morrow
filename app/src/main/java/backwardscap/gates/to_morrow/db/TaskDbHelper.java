@@ -36,11 +36,22 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void getThisTask( int ID){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor c = db.rawQuery("select task from " + TaskContract.TaskEntry.TABLE + " where ID = "+ ID,null);
+        c.moveToFirst();
+
+        Log.d("TAG",c.getString(0));
+
+    }
+
     public boolean updateTask (Integer id, String task, String table)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("title", task);
+        contentValues.put("task", task);
         contentValues.put("date", Calendar.getInstance().DAY_OF_YEAR +","+Calendar.getInstance().YEAR);
         db.update(table, contentValues, "id = ? ", new String[] { Integer.toString(id) } );
         return true;
