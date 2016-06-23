@@ -39,26 +39,11 @@ public class MainActivity extends AppCompatActivity {
         dbHelper = new TaskDbHelper(this);
         mTaskListView = (ListView) findViewById(R.id.list_todo);
 
-        mTaskListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int searchID = position + 1;
 
-                Bundle dataBundle = new Bundle();
 
-                dataBundle.putInt("id",searchID);
+        //SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-                Intent intent = new Intent(getApplicationContext(),TaskContract.class);
-
-                intent.putExtras(dataBundle);
-                startActivity(intent);
-
-            }
-        });
-
-                //SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-                UpdateUI();
+        UpdateUI();
     }
 
 
@@ -117,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        Log.d(TAG,"End");
+        Log.d(TAG,"EndiT");
     }
 
     public void deleteTask(View view){
@@ -136,16 +121,15 @@ public class MainActivity extends AppCompatActivity {
         UpdateUI();
     }
 
+    @SuppressWarnings("unchecked")
     private void UpdateUI(){
 
         ArrayList taskList = dbHelper.getAllTasks();
 
         //If the ArrayAdapter is not there, create one
         if(mAdapter==null){
-            mAdapter = new ArrayAdapter<>(this,
-                    R.layout.item_todo,
-                    R.id.task_title,
-                    taskList);
+
+            mAdapter = new ArrayAdapter<>(this, R.layout.item_todo, R.id.task_title, taskList);
             mTaskListView.setAdapter(mAdapter);
         }
         //Otherwise we clear it and then add all tasks
