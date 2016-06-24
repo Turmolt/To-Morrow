@@ -16,8 +16,6 @@ import java.util.Calendar;
 
 public class TaskDbHelper extends SQLiteOpenHelper {
 
-
-
     public TaskDbHelper(Context context){
         super(context,TaskContract.DB_NAME, null, TaskContract.DB_VERSION);
     }
@@ -36,20 +34,24 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void getThisTask( int ID){
+    public void getThisTask(String task){
 
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor c = db.rawQuery("select * from tasks",null);
         c.moveToFirst();
-        while(c.moveToNext()) {
-            for (int i = 0; i < c.getColumnCount(); i++) {
-                Log.d("DB:", c.getString(i));
+
+        if(!c.getString(1).contentEquals(task)) {
+            Log.d("Cursor",task);
+            while (c.moveToNext()) {
+                if(c.getString(1).contentEquals(task)) {
+                    Log.d("Task",task);
+                    break;
+                }
             }
-            Log.d("End","Cursor Next");
         }
-
-
+        Log.d("Cursor",task);
+        Log.d("Cursor",c.getString(0)+ " | " + c.getString(1));
     }
 
     public boolean updateTask (Integer id, String task, String table)
@@ -62,20 +64,23 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         return true;
     }
 
-
     //Populate arraylist with all tasks
     public ArrayList<String> getAllTasks()
     {
         ArrayList<String> array_list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor =  db.rawQuery( "select * from tasks", null );
-        cursor.moveToFirst();
+        if(cursor.moveToFirst()){
+            array_list.add(cursor.getString(cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE)));
 
-        //Walk through the array of tasks, adding each to the taskList
-        while(cursor.moveToNext()){
-            int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
-            array_list.add(cursor.getString(idx));
+            //Walk through the array of tasks, adding each to the taskList
+            while(cursor.moveToNext()){
+                int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
+                array_list.add(cursor.getString(idx));
+            }
+
         }
+
 
         cursor.close();
         db.close();

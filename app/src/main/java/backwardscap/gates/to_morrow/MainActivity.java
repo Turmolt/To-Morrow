@@ -100,8 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayList arrayList = dbHelper.getAllTasks();
 
-
-        dbHelper.getThisTask(0);
+        dbHelper.getThisTask(task);
 
         Log.d(TAG,"EndiT");
     }
@@ -124,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressWarnings("unchecked")
     private void UpdateUI(){
-
         ArrayList taskList = dbHelper.getAllTasks();
 
         //If the ArrayAdapter is not there, create one
