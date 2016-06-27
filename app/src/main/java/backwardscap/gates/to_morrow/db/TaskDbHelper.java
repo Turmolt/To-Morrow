@@ -56,7 +56,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
         if(c.moveToFirst()) {
             c.moveToFirst();
-            Log.d("Cursor", c.getString(0) + " | " + c.getString(1));
+            Log.d("Cursor", c.getString(0) + " | " + c.getString(1) + " | " + c.getString(2));
             t.setID(Integer.parseInt(c.getString(0)));
             t.setTaskText(c.getString(1));
             t.setDate(c.getString(2));
@@ -68,7 +68,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
         }
         db.close();
-
+        Log.d("TG","New Lookup Working");
         return t;
     }
 
@@ -83,17 +83,18 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         db.insert(tableName,null,v);
     }
 
-    public boolean updateTask (Integer id, String task, String table)
+
+    public boolean updateTask (String task, String newTask, String table)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("task", task);
-        contentValues.put("date", Calendar.getInstance().DAY_OF_YEAR +","+Calendar.getInstance().YEAR);
-        db.update(table, contentValues, "id = ? ", new String[] { Integer.toString(id) } );
+        contentValues.put(TaskContract.TaskEntry.COL_TASK_TITLE, newTask);
+        contentValues.put(TaskContract.TaskEntry.COL_TASK_DATE, Calendar.DATE);
+        db.update(table, contentValues, TaskContract.TaskEntry.COL_TASK_TITLE+" = ? ", new String[] { task } );
         return true;
     }
 
-    public boolean DeleteTask(String tableName,String taskName){
+    public boolean deleteTask(String tableName,String taskName){
         boolean r = false;
 
         String query = "Select * from " + tableName + " where "+TaskContract.TaskEntry.COL_TASK_TITLE+" = \"" + taskName + "\"";
@@ -104,10 +105,13 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
         Task t = new Task();
 
+
         if(c.moveToFirst()){
+            Log.d("Delete",c.getString(0) + " | " + c.getString(1) + " | " + c.getString(2));
             t.setID(Integer.parseInt(c.getString(0)));
+            t.setTaskText(taskName);
             db.delete(tableName, TaskContract.TaskEntry.COL_TASK_TITLE + " = ?",
-                    new String[] {String.valueOf(t.getID())});
+                    new String[] {String.valueOf(t.getTaskText())});
             c.close();
             r = true;
         }

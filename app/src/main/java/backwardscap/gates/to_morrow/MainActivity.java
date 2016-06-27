@@ -1,5 +1,6 @@
 package backwardscap.gates.to_morrow;
 
+import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,13 +11,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import backwardscap.gates.to_morrow.db.Task;
 import backwardscap.gates.to_morrow.db.TaskContract;
@@ -28,6 +32,10 @@ public class MainActivity extends AppCompatActivity {
     private TaskDbHelper dbHelper;
     private ListView mTaskListView;
 
+    private Date date;
+    private String myDate;
+    private SimpleDateFormat dateForm;
+
     private ListView TmrListView;
 
     private ArrayAdapter<String> mAdapter;
@@ -38,10 +46,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         dbHelper = new TaskDbHelper(this);
         mTaskListView = (ListView) findViewById(R.id.list_todo);
-
+        TmrListView = (ListView) findViewById(R.id.list_tmr);
+        dateForm = new SimpleDateFormat("MM-dd");
         UpdateUI();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -62,23 +70,14 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
+                                date = new Date();
+                                myDate = dateForm.format(date);
                                 Task t = new Task();
                                 String task = String.valueOf(taskEditText.getText());
                                 t.setTaskText(task);
-                                t.setDate(Calendar.getInstance().DAY_OF_YEAR +","+Calendar.getInstance().YEAR);
+                                t.setDate(""+myDate);
                                 dbHelper.AddTask(TaskContract.TaskEntry.TDY_TABLE, t);
 
-
-//                                SQLiteDatabase db = dbHelper.getWritableDatabase();
-//
-//                                ContentValues values = new ContentValues();
-//                                values.put(TaskContract.TaskEntry.COL_TASK_TITLE,task);
-//                                db.insertWithOnConflict(TaskContract.TaskEntry.TDY_TABLE,
-//                                        null,
-//                                        values,
-//                                        SQLiteDatabase.CONFLICT_REPLACE);
-//                                db.close();
                                 UpdateUI();
 
                             }
@@ -94,19 +93,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void editTextTDY(View view){
-
         View parent = (View) view.getParent();
 
         final TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
         taskTextView.setSelected(true);
 
-        String task = String.valueOf(taskTextView.getText());
+        final String oldTask = taskTextView.getText().toString();
 
-        ArrayList arrayList = dbHelper.getAllTasksTDY();
+        //Log.d(TAG,"Add a new task");
+        final EditText taskEditText = new EditText(this);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Editing task")
+                .setView(taskEditText)
+                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        date = new Date();
+                        myDate = dateForm.format(date);
+                        Task t = new Task();
+                        String task = String.valueOf(taskEditText.getText());
+                        t.setTaskText(task);
+                        t.setDate(""+myDate);
+                        dbHelper.updateTask(oldTask, task, TaskContract.TaskEntry.TDY_TABLE);
 
-        dbHelper.getThisTask(TaskContract.TaskEntry.TDY_TABLE,task);
+                        UpdateUI();
 
-        Log.d(TAG,"EndiT");
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.show();
     }
 
     public void deleteTask(View view){
@@ -116,19 +132,14 @@ public class MainActivity extends AppCompatActivity {
 
         //Identify task
         String task = String.valueOf(taskTextView.getText());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        //Delete entry
-        db.delete(TaskContract.TaskEntry.TDY_TABLE,TaskContract.TaskEntry.COL_TASK_TITLE+" = ?",
-                new String[]{task});
-        db.close();
+        //send command to dbHelper to delete task
+        dbHelper.deleteTask(TaskContract.TaskEntry.TDY_TABLE,task);
         UpdateUI();
     }
 
     @SuppressWarnings("unchecked")
     private void UpdateUI(){
         ArrayList taskList = dbHelper.getAllTasksTDY();
-
         //If the ArrayAdapter is not there, create one
         if(mAdapter==null){
 
@@ -140,8 +151,6 @@ public class MainActivity extends AppCompatActivity {
             mAdapter.clear();
             mAdapter.addAll(taskList);
             mAdapter.notifyDataSetChanged();
-
         }
     }
-
 }

@@ -18,12 +18,13 @@
         android:layout_toLeftOf="@+id/task_delete"
         android:layout_toStartOf="@+id/task_delete"
         android:layout_alignParentTop="true"
-        android:onClick="editTextTDY"
-        android:gravity="fill_vertical" />
+        android:longClickable="true"
+        android:onClick = "editTextTDY"
+        android:gravity="fill_vertical"/>
 
     <Button
         android:id="@+id/task_delete"
-        android:layout_width="wrap_content"
+        android:layout_width="50sp"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
