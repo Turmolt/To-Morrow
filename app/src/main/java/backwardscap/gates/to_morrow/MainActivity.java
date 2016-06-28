@@ -36,8 +36,11 @@ public class MainActivity extends AppCompatActivity {
     private String myDate;
     private SimpleDateFormat dateForm;
 
+
+
     private ListView TmrListView;
 
+    private ArrayAdapter<String> dateAdapter;
     private ArrayAdapter<String> mAdapter;
 
     @Override
@@ -114,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                         String task = String.valueOf(taskEditText.getText());
                         t.setTaskText(task);
                         t.setDate(""+myDate);
-                        dbHelper.updateTask(oldTask, task, TaskContract.TaskEntry.TDY_TABLE);
+                        dbHelper.updateTask(oldTask, t, TaskContract.TaskEntry.TDY_TABLE);
 
                         UpdateUI();
 
@@ -131,7 +134,9 @@ public class MainActivity extends AppCompatActivity {
         TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
 
         //Identify task
-        String task = String.valueOf(taskTextView.getText());
+        Task task = new Task();
+        task.setTaskText(String.valueOf(taskTextView.getText()));
+
         //send command to dbHelper to delete task
         dbHelper.deleteTask(TaskContract.TaskEntry.TDY_TABLE,task);
         UpdateUI();
@@ -139,18 +144,27 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressWarnings("unchecked")
     private void UpdateUI(){
-        ArrayList taskList = dbHelper.getAllTasksTDY();
+        ArrayList taskDate = dbHelper.getAllTasks(TaskContract.TaskEntry.TDY_TABLE);
+        ArrayList taskList = (ArrayList)taskDate.get(0);
+        ArrayList dateList = (ArrayList)taskDate.get(1);
+
         //If the ArrayAdapter is not there, create one
         if(mAdapter==null){
 
             mAdapter = new ArrayAdapter<>(this, R.layout.item_todo, R.id.task_title, taskList);
+            dateAdapter = new ArrayAdapter<>(this,R.layout.item_todo,R.id.task_date,dateList);
             mTaskListView.setAdapter(mAdapter);
+            mTaskListView.setAdapter(dateAdapter);
         }
         //Otherwise we clear it and then add all tasks
         else {
             mAdapter.clear();
             mAdapter.addAll(taskList);
             mAdapter.notifyDataSetChanged();
+
+            dateAdapter.clear();
+            dateAdapter.addAll(dateList);
+            dateAdapter.notifyDataSetChanged();
         }
     }
 }

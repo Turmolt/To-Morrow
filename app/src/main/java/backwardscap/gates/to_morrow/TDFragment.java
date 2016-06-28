@@ -24,6 +24,4 @@ public class TDFragment extends Fragment {
         return inflater.inflate(R.layout.activity_main,container,false);
     }
 
-
-
 }
