@@ -90,15 +90,15 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         Cursor c = db.rawQuery("Select * from "+table+" where "+TaskContract.TaskEntry.COL_TASK_DATE+" = \""+task+"+\"",null);
         if(c.moveToFirst()){
-            //
-            if(c.getString(2)==newTask.getDate()) {
+            //TODO: match task based on date and time that it was created
+            //if(c.getString(2)==newTask.getDate()) {
                 //Date match
                 contentValues.put(TaskContract.TaskEntry.COL_TASK_TITLE, newTask.getTaskText());
                 contentValues.put(TaskContract.TaskEntry.COL_TASK_DATE, Calendar.DATE);
                 db.update(table, contentValues, TaskContract.TaskEntry.COL_TASK_TITLE + " = ? ", new String[]{task});
                 c.close();
                 return true;
-            }
+            //}
         }
         c.close();
         return false;
@@ -115,7 +115,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
         Task t = new Task();
 
-
+        //TODO: match task based on date and time that it was created
         if(c.moveToFirst()){
 
             //Log.d("Delete",c.getString(0) + " | " + c.getString(1) + " | " + c.getString(2));

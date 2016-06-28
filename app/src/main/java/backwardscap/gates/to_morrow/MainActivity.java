@@ -46,11 +46,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.todo_lists);
         dbHelper = new TaskDbHelper(this);
         mTaskListView = (ListView) findViewById(R.id.list_todo);
         TmrListView = (ListView) findViewById(R.id.list_tmr);
-        dateForm = new SimpleDateFormat("MM-dd");
+        dateForm = new SimpleDateFormat("MM-dd kk:mm:ss");
+
         UpdateUI();
     }
 
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 date = new Date();
+
                                 myDate = dateForm.format(date);
                                 Task t = new Task();
                                 String task = String.valueOf(taskEditText.getText());
@@ -152,9 +154,9 @@ public class MainActivity extends AppCompatActivity {
         if(mAdapter==null){
 
             mAdapter = new ArrayAdapter<>(this, R.layout.item_todo, R.id.task_title, taskList);
-            dateAdapter = new ArrayAdapter<>(this,R.layout.item_todo,R.id.task_date,dateList);
+
             mTaskListView.setAdapter(mAdapter);
-            mTaskListView.setAdapter(dateAdapter);
+
         }
         //Otherwise we clear it and then add all tasks
         else {
@@ -162,6 +164,13 @@ public class MainActivity extends AppCompatActivity {
             mAdapter.addAll(taskList);
             mAdapter.notifyDataSetChanged();
 
+
+        }
+
+        if(dateAdapter==null){
+            dateAdapter = new ArrayAdapter<>(this,R.layout.item_todo,R.id.task_date,dateList);
+            mTaskListView.setAdapter(dateAdapter);
+        }else{
             dateAdapter.clear();
             dateAdapter.addAll(dateList);
             dateAdapter.notifyDataSetChanged();
