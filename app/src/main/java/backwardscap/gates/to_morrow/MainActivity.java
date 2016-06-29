@@ -97,13 +97,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Edit the text of the "TDY" SQL table
     public void editTextTDY(View view){
         View parent = (View) view.getParent();
 
         final TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
         taskTextView.setSelected(true);
-
-        final String oldTask = taskTextView.getText().toString();
+        final TextView dateTextView = (TextView)parent.findViewById(R.id.task_date);
+        //final String oldTask = taskTextView.getText().toString();
+        //final String oldDate =
 
         //Log.d(TAG,"Add a new task");
         final EditText taskEditText = new EditText(this);
@@ -114,11 +116,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         date = new Date();
-                        myDate = dateForm.format(date);
+
                         Task t = new Task();
                         String task = String.valueOf(taskEditText.getText());
                         t.setTaskText(task);
                         t.setDate(""+myDate);
+
+                        Task oldTask = new Task(taskTextView.getText().toString(),dateTextView.getText().toString());
+
                         dbHelper.updateTask(oldTask, t, TaskContract.TaskEntry.TDY_TABLE);
 
                         UpdateUI();

@@ -84,20 +84,27 @@ public class TaskDbHelper extends SQLiteOpenHelper {
     }
 
 
-    public boolean updateTask (String task, Task newTask, String table)
+    public boolean updateTask (Task task, Task newTask, String table)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        Cursor c = db.rawQuery("Select * from "+table+" where "+TaskContract.TaskEntry.COL_TASK_DATE+" = \""+task+"+\"",null);
+        Cursor c = db.rawQuery("Select * from "+table+" where "+TaskContract.TaskEntry.COL_TASK_TITLE+" = \""+task+"+\"",null);
         if(c.moveToFirst()){
             //TODO: match task based on date and time that it was created
             //if(c.getString(2)==newTask.getDate()) {
-                //Date match
-                contentValues.put(TaskContract.TaskEntry.COL_TASK_TITLE, newTask.getTaskText());
-                contentValues.put(TaskContract.TaskEntry.COL_TASK_DATE, Calendar.DATE);
-                db.update(table, contentValues, TaskContract.TaskEntry.COL_TASK_TITLE + " = ? ", new String[]{task});
-                c.close();
-                return true;
+            //Date match
+
+            //contentValues.put(TaskContract.TaskEntry.COL_TASK_TITLE, newTask.getTaskText());
+            //contentValues.put(TaskContract.TaskEntry.COL_TASK_DATE, Calendar.DATE);
+            //String oldTask = task.getTaskText();
+            //db.update(table, contentValues, TaskContract.TaskEntry.COL_TASK_TITLE + " = ? ", new String[]{oldTask});
+            db.rawQuery(    "UPDATE "+  table+
+                            " SET "+    TaskContract.TaskEntry.COL_TASK_TITLE+"="+newTask.getTaskText()+","+
+                                        TaskContract.TaskEntry.COL_TASK_DATE+"="+newTask.getDate()+
+                            " WHERE "+  TaskContract.TaskEntry.COL_TASK_TITLE+"="+task.getTaskText()+","+
+                                        TaskContract.TaskEntry.COL_TASK_DATE+"="+task.getDate(),null);
+            c.close();
+            return true;
             //}
         }
         c.close();
