@@ -78,6 +78,8 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         v.put(TaskContract.TaskEntry.COL_TASK_TITLE,t.getTaskText());
         v.put(TaskContract.TaskEntry.COL_TASK_DATE,t.getDate());
 
+        Log.d("Add Task",t.getTaskText()+" | " + t.getDate());
+
         SQLiteDatabase db= this.getWritableDatabase();
 
         db.insert(tableName,null,v);
@@ -87,40 +89,31 @@ public class TaskDbHelper extends SQLiteOpenHelper {
     public boolean updateTask (Task task, Task newTask, String table)
     {
         SQLiteDatabase db = this.getWritableDatabase();
+        String query = "UPDATE "+  table+
+                " SET "+    TaskContract.TaskEntry.COL_TASK_TITLE+"=\""+newTask.getTaskText()+"\","+
+                TaskContract.TaskEntry.COL_TASK_DATE+"=\""+newTask.getDate()+
+                "\" WHERE "+  TaskContract.TaskEntry.COL_TASK_TITLE+"=\""+task.getTaskText()+"\" AND "+
+                TaskContract.TaskEntry.COL_TASK_DATE+"=\""+task.getDate()+"\"";
         ContentValues contentValues = new ContentValues();
-        Cursor c = db.rawQuery("Select * from "+table+" where "+TaskContract.TaskEntry.COL_TASK_TITLE+" = \""+task+"+\"",null);
-        if(c.moveToFirst()){
-            //TODO: match task based on date and time that it was created
-            //if(c.getString(2)==newTask.getDate()) {
-            //Date match
+        db.execSQL(query);
 
-            //contentValues.put(TaskContract.TaskEntry.COL_TASK_TITLE, newTask.getTaskText());
-            //contentValues.put(TaskContract.TaskEntry.COL_TASK_DATE, Calendar.DATE);
-            //String oldTask = task.getTaskText();
-            //db.update(table, contentValues, TaskContract.TaskEntry.COL_TASK_TITLE + " = ? ", new String[]{oldTask});
-            db.rawQuery(    "UPDATE "+  table+
-                            " SET "+    TaskContract.TaskEntry.COL_TASK_TITLE+"="+newTask.getTaskText()+","+
-                                        TaskContract.TaskEntry.COL_TASK_DATE+"="+newTask.getDate()+
-                            " WHERE "+  TaskContract.TaskEntry.COL_TASK_TITLE+"="+task.getTaskText()+","+
-                                        TaskContract.TaskEntry.COL_TASK_DATE+"="+task.getDate(),null);
-            c.close();
-            return true;
-            //}
-        }
-        c.close();
-        return false;
+        Log.d("SQL",query);
+        return true;
     }
 
     public boolean deleteTask(String tableName,Task task){
         boolean r = false;
 
-        String query = "Select * from " + tableName + " where "+TaskContract.TaskEntry.COL_TASK_TITLE+" = \"" + task.getTaskText() + "\"";
+        String query = "Delete from " + tableName + " where "+TaskContract.TaskEntry.COL_TASK_TITLE+" = \"" + task.getTaskText() + "\""
+                +" AND "+TaskContract.TaskEntry.COL_TASK_DATE+" = \""+task.getDate()+"\"";
+
+        Log.d("SQLite",query);
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        Cursor c = db.rawQuery(query,null);
+        db.execSQL(query);
 
-        Task t = new Task();
+        /*Task t = new Task();
 
         //TODO: match task based on date and time that it was created
         if(c.moveToFirst()){
@@ -128,48 +121,64 @@ public class TaskDbHelper extends SQLiteOpenHelper {
             //Log.d("Delete",c.getString(0) + " | " + c.getString(1) + " | " + c.getString(2));
             t.setID(Integer.parseInt(c.getString(0)));
             t.setTaskText(task.getTaskText());
-            db.delete(tableName, TaskContract.TaskEntry.COL_TASK_TITLE + " = ?",
-                    new String[] {String.valueOf(t.getTaskText())});
 
+
+
+            //db.delete(tableName, TaskContract.TaskEntry.COL_TASK_TITLE + " = ?",
+             //       new String[] {String.valueOf(t.getTaskText())});
             r = true;
         }
         c.close();
+        */
         db.close();
-        return r;
+
+        return true;
+
     }
 
 
     //Populate arraylist with all tasks
-    public ArrayList<ArrayList> getAllTasks(String table)
+    public ArrayList<Task> getAllTasks(String table)
     {
-        ArrayList<ArrayList> array_list = new ArrayList<>();
+        ArrayList<Task> array_list = new ArrayList<>();
 
-        ArrayList<String> dateList = new ArrayList<>();
-        ArrayList<String> taskList = new ArrayList<>();
-        String newDate;
-        String newTask;
+
+
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor =  db.rawQuery( "select * from "+table, null );
         if(cursor.moveToFirst()){
+            Task t = new Task();
 
-            newTask =cursor.getString(cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE));
-            taskList.add(newTask);
+            String newTask =cursor.getString(cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE));
 
-            newDate = cursor.getString(cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_DATE));
-            dateList.add(newDate);
+            t.setTaskText(newTask);
 
+            String newDate = cursor.getString(cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_DATE));
+
+            t.setDate(newDate);
+
+            //Log.d("Task",newTask + " | " + newDate);
+
+            array_list.add(t);
 
             //Walk through the array of tasks, adding each to the taskList
             while(cursor.moveToNext()){
-                newTask =cursor.getString(cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE));
-                taskList.add(newTask);
+                t=new Task();
 
-                newDate = cursor.getString(cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_DATE));
-                dateList.add(newDate);
+                String newTask2 =cursor.getString(cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE));
+
+                t.setTaskText(newTask2);
+
+                String newDate2 = cursor.getString(cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_DATE));
+
+                t.setDate(newDate2);
+
+
+                array_list.add(t);
+                //Log.d("Task2",newTask2 + " | " + newDate2);
             }
         }
-        array_list.add(taskList);
-        array_list.add(dateList);
+
 
         cursor.close();
         db.close();

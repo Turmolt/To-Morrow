@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import backwardscap.gates.to_morrow.db.Task;
+import backwardscap.gates.to_morrow.db.TaskAdapter;
 import backwardscap.gates.to_morrow.db.TaskContract;
 import backwardscap.gates.to_morrow.db.TaskDbHelper;
 
@@ -40,8 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView TmrListView;
 
-    private ArrayAdapter<String> dateAdapter;
-    private ArrayAdapter<String> mAdapter;
+    private TaskAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,8 +102,10 @@ public class MainActivity extends AppCompatActivity {
         View parent = (View) view.getParent();
 
         final TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
-        taskTextView.setSelected(true);
+        //taskTextView.setSelected(true);
         final TextView dateTextView = (TextView)parent.findViewById(R.id.task_date);
+
+        Log.d("PreEdit",taskTextView.getText().toString()+" | "+dateTextView.getText().toString());
         //final String oldTask = taskTextView.getText().toString();
         //final String oldDate =
 
@@ -116,13 +118,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         date = new Date();
-
+                        myDate = dateForm.format(date);
                         Task t = new Task();
                         String task = String.valueOf(taskEditText.getText());
                         t.setTaskText(task);
                         t.setDate(""+myDate);
 
-                        Task oldTask = new Task(taskTextView.getText().toString(),dateTextView.getText().toString());
+                        Task oldTask = new Task();
+                        oldTask.setDate(dateTextView.getText().toString());
+                        oldTask.setTaskText(taskTextView.getText().toString());
 
                         dbHelper.updateTask(oldTask, t, TaskContract.TaskEntry.TDY_TABLE);
 
@@ -139,11 +143,11 @@ public class MainActivity extends AppCompatActivity {
         //Get View Parent
         View parent = (View) view.getParent();
         TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
-
+        TextView dateTextView = (TextView) parent.findViewById(R.id.task_date);
         //Identify task
         Task task = new Task();
         task.setTaskText(String.valueOf(taskTextView.getText()));
-
+        task.setDate(String.valueOf(dateTextView.getText()));
         //send command to dbHelper to delete task
         dbHelper.deleteTask(TaskContract.TaskEntry.TDY_TABLE,task);
         UpdateUI();
@@ -151,14 +155,14 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressWarnings("unchecked")
     private void UpdateUI(){
-        ArrayList taskDate = dbHelper.getAllTasks(TaskContract.TaskEntry.TDY_TABLE);
-        ArrayList taskList = (ArrayList)taskDate.get(0);
-        ArrayList dateList = (ArrayList)taskDate.get(1);
+        ArrayList taskList = dbHelper.getAllTasks(TaskContract.TaskEntry.TDY_TABLE);
 
-        //If the ArrayAdapter is not there, create one
+
+        //If the mAdapter is not there, create one
         if(mAdapter==null){
 
-            mAdapter = new ArrayAdapter<>(this, R.layout.item_todo, R.id.task_title, taskList);
+            mAdapter = new TaskAdapter(this, taskList);
+
 
             mTaskListView.setAdapter(mAdapter);
 
@@ -170,15 +174,6 @@ public class MainActivity extends AppCompatActivity {
             mAdapter.notifyDataSetChanged();
 
 
-        }
-
-        if(dateAdapter==null){
-            dateAdapter = new ArrayAdapter<>(this,R.layout.item_todo,R.id.task_date,dateList);
-            mTaskListView.setAdapter(dateAdapter);
-        }else{
-            dateAdapter.clear();
-            dateAdapter.addAll(dateList);
-            dateAdapter.notifyDataSetChanged();
         }
     }
 }

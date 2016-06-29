@@ -2,38 +2,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_gravity="center_vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/task_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="xxx"
+        android:textSize="20dp"
+        android:onClick = "editTextTDY"
+        android:gravity="top"
+        android:paddingBottom="12dp"
+        android:paddingLeft="2dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:text="xxx"
-        android:textSize="25dp"
-        android:layout_alignBottom="@+id/task_delete"
         android:layout_toLeftOf="@+id/task_delete"
         android:layout_toStartOf="@+id/task_delete"
-        android:layout_alignParentTop="true"
-        android:onClick = "editTextTDY"
-        android:gravity="center_vertical"
-        android:paddingBottom="10dp"
-        android:textStyle="bold"
-        android:paddingLeft="10dp" />
+        android:layout_alignParentTop="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/task_date"
         android:text="MM-dd   HH:mm"
-        android:textSize="15dp"
+        android:textSize="12dp"
+        android:textStyle="italic"
+        android:paddingLeft="2dp"
+        android:textColor="@color/button_material_light"
+        android:paddingBottom="1dp"
         android:layout_alignBottom="@+id/task_title"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textStyle="italic"
-        android:paddingLeft="10dp" />
+        android:layout_alignParentStart="true" />
 
     <Button
         android:id="@+id/task_delete"
@@ -43,6 +42,7 @@
         android:layout_alignParentRight="true"
         android:onClick="deleteTask"
         android:text = "X"
-        />
+        android:layout_alignBottom="@+id/task_date"
+        android:layout_alignParentTop="true" />
 
 </RelativeLayout>
