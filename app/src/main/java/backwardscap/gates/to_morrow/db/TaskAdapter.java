@@ -1,10 +1,12 @@
 package backwardscap.gates.to_morrow.db;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -23,6 +25,9 @@ public class TaskAdapter extends ArrayAdapter<Task>{
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
+
+
         // Get the data item for this position
         Task t = getItem(position);
 
@@ -34,6 +39,18 @@ public class TaskAdapter extends ArrayAdapter<Task>{
         // Lookup view for data population
         TextView task = (TextView) convertView.findViewById(R.id.task_title);
         TextView date = (TextView) convertView.findViewById(R.id.task_date);
+
+        Log.d("TaskAdapter",""+position);
+        ImageView IV = (ImageView)convertView.findViewById(R.id.startDivider);
+        //if position is 0 then turn start divider alpha to 1
+        if(position == 0){
+
+            IV.setAlpha(1.0f);
+        }else{
+
+            IV.setAlpha(0.0f);
+        }
+
 
         // Populate the data into the template view using the data object
         task.setText(t.getTaskText());

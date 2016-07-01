@@ -11,21 +11,23 @@
         android:text="xxx"
         android:textSize="20dp"
         android:onClick = "editTextTDY"
-        android:gravity="top"
-        android:paddingBottom="12dp"
+        android:paddingBottom="6dp"
         android:paddingLeft="2dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_toLeftOf="@+id/task_delete"
         android:layout_toStartOf="@+id/task_delete"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        android:paddingTop="6dp"
+        android:textColor="#c1dcec" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/task_date"
         android:text="MM-dd   HH:mm"
-        android:textSize="12dp"
+        android:textSize="0dp"
         android:textStyle="italic"
         android:paddingLeft="2dp"
         android:textColor="@color/button_material_light"
@@ -41,8 +43,34 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:onClick="deleteTask"
+        android:backgroundTint="#c1dcec"
         android:text = "X"
+        android:layout_alignParentTop="true"
         android:layout_alignBottom="@+id/task_date"
-        android:layout_alignParentTop="true" />
+        android:textColor="#4c5a65" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/endDivider"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@+id/task_title"
+        android:background="#000000"
+        android:src="#a6bcc9" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/startDivider"
+        android:background="#000000"
+        android:src="#a6bcc9"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:alpha="0" />
 
 </RelativeLayout>
