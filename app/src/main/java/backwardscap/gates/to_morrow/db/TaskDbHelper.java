@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -88,6 +89,9 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
     public boolean updateTask (Task task, Task newTask, String table)
     {
+        if(isLaterDate(newTask,task)){
+            Log.d("Date","Task is newer");
+        }
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "UPDATE "+  table+
                 " SET "+    TaskContract.TaskEntry.COL_TASK_TITLE+"=\""+newTask.getTaskText()+"\","+
@@ -99,6 +103,76 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
         Log.d("SQL",query);
         return true;
+    }
+
+    public boolean isLaterDate(Task t, Task compareTo){
+        boolean isLater = false;
+
+        char[] t1 = t.getDate().toCharArray();
+        char[] t2 = compareTo.getDate().toCharArray();
+
+//      ("MM-dd-YYYY kk:mm:ss")
+//      ("0123456789012345678")
+
+
+        int t1Year = Integer.parseInt(""+t1[6]+t1[7]+t1[8]+t1[9]);
+        int t2Year = Integer.parseInt(""+t1[6]+t1[7]+t1[8]+t1[9]);
+
+        int t1Month = Integer.parseInt(""+t1[0]+t1[1]);
+        int t2Month = Integer.parseInt(""+t2[0]+t2[1]);
+
+        int t1Day = Integer.parseInt(""+t1[3]+t1[4]);
+        int t2Day = Integer.parseInt(""+t2[3]+t2[4]);
+
+        int t1Hr = Integer.parseInt(""+t1[11]+t1[12]);
+        int t2Hr = Integer.parseInt(""+t2[11]+t2[12]);
+
+        int t1Min = Integer.parseInt(""+t1[14]+t1[15]);
+        int t2Min = Integer.parseInt(""+t2[14]+t2[15]);
+
+        int t1Sec = Integer.parseInt(""+t1[17]+t1[18]);
+        int t2Sec = Integer.parseInt(""+t2[17]+t2[18]);
+
+        if(t1Year == t2Year) {
+            Log.d("Date","Year same");
+            //years are the same,compare months
+            if (t1Month == t2Month) {
+                Log.d("Date","Month same");
+                //Months are the same, compare days
+                if(t1Day==t2Day){
+                    Log.d("Date","Day same");
+                    //Days are the same, compare hours
+                    if(t1Hr==t2Hr){
+                        Log.d("Date","Hr same");
+                        //hrs are the same, compare min
+                        if(t1Min==t2Min){
+                            Log.d("Date","Min same");
+                            //mins are same, finally compare seconds
+                            if(t1Sec>t2Sec) {
+                                Log.d("Date","Seconds is newer");
+                                isLater = true;
+                            }
+                            else if(t1Sec<t2Sec) {
+                                Log.d("Date","Seconds is older");
+                                isLater = false;
+                            }
+                        }
+                        else if(t1Min>t2Min)
+                            isLater = true;
+                    }
+                    else if(t1Hr > t2Hr)
+                        isLater=true;
+                }
+                else if(t1Day > t2Day)
+                    isLater = true;
+            }
+        }
+        else if(t1Year>t2Year)
+                isLater=true;
+
+
+
+        return isLater;
     }
 
     public boolean deleteTask(String tableName,Task task){

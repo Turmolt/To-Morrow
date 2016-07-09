@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         dbHelper = new TaskDbHelper(this);
         mTaskListView = (ListView) findViewById(R.id.list_todo);
         TmrListView = (ListView) findViewById(R.id.list_tmr);
-        dateForm = new SimpleDateFormat("MM-dd kk:mm:ss");
+        dateForm = new SimpleDateFormat("MM-dd-yyyy kk:mm:ss");
 
         UpdateUI();
     }
@@ -111,12 +111,16 @@ public class MainActivity extends AppCompatActivity {
 
         //Log.d(TAG,"Add a new task");
         final EditText taskEditText = new EditText(this);
+        taskEditText.setText(taskTextView.getText().toString());
+        taskEditText.setSelection(taskTextView.getText().length(),taskTextView.getText().length());
+
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Editing task")
                 .setView(taskEditText)
                 .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
                         date = new Date();
                         myDate = dateForm.format(date);
                         Task t = new Task();
